@@ -40,17 +40,18 @@ def run_batch_inference(
 
     for batch in tqdm(loader, desc="inference"):
         messages_batch = [example.to_messages(system_prompt=system_prompt) for example in batch]
-        predictions_by_example: list[list[str]] = [[] for _ in batch]
+        prediction_details_by_example: list[list[dict]] = [[] for _ in batch]
 
         for _ in range(n_generation):
-            batch_predictions = engine.generate_from_messages_batch(
+            batch_results = engine.generate_from_messages_batch_with_details(
                 messages_batch,
                 config=generation_config,
             )
-            for predictions, prediction in zip(predictions_by_example, batch_predictions):
-                predictions.append(prediction)
+            for prediction_details, result in zip(prediction_details_by_example, batch_results):
+                prediction_details.append(result.to_dict())
 
-        for example, predictions in zip(batch, predictions_by_example):
+        for example, prediction_details in zip(batch, prediction_details_by_example):
+            predictions = [result["text"] for result in prediction_details]
             rows.append(
                 {
                     "id": example.id,
@@ -58,6 +59,7 @@ def run_batch_inference(
                     "images": example.images,
                     "prediction": predictions[0],
                     "predictions": predictions,
+                    "prediction_details": prediction_details,
                     "target": example.target,
                     "metadata": example.metadata,
                 }

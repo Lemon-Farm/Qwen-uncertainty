@@ -1,0 +1,15 @@
+data:
+  input_json: outputs/predictions.json
+  output_json: outputs/predictions_semantic_clusters.json
+
+model:
+  id: cross-encoder/nli-deberta-v3-large
+  device: null
+  batch_size: 32
+  max_length: 512
+
+clustering:
+  entailment_threshold: null
+  premise_template: "Question: {question}\nAnswer: {answer}"
+  hypothesis_template: "Question: {question}\nAnswer: {answer}"
+  include_pair_scores: false

@@ -52,17 +52,19 @@ def main() -> None:
         temperature=args.temperature,
         top_p=args.top_p,
     )
-    outputs = [
-        engine.generate(
-            images=args.image,
-            prompt=prompt,
-            system_prompt=args.system_prompt,
-            config=config,
-        )
+    messages = engine.build_messages(images=args.image, prompt=prompt, system_prompt=args.system_prompt)
+    details = [
+        engine.generate_from_messages_batch_with_details([messages], config=config)[0].to_dict()
         for _ in range(args.n_generation)
     ]
+    outputs = [result["text"] for result in details]
     if args.json:
-        print(json.dumps({"prediction": outputs[0], "predictions": outputs}, ensure_ascii=False))
+        print(
+            json.dumps(
+                {"prediction": outputs[0], "predictions": outputs, "prediction_details": details},
+                ensure_ascii=False,
+            )
+        )
     else:
         print("\n".join(outputs))
 
