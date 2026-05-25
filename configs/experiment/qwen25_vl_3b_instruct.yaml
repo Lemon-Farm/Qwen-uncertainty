@@ -1,0 +1,19 @@
+model:
+  id: Qwen/Qwen2.5-VL-3B-Instruct
+  device_map: auto
+  torch_dtype: auto
+  attn_implementation: sdpa
+  min_pixels: 200704 # 256 * 28 * 28
+  max_pixels: 1003520 # 1280 * 28 * 28
+
+generation:
+  max_new_tokens: 50
+  batch_size: 8
+  n_generation: 3
+  do_sample: true
+  temperature: 1.0
+  top_p: null
+
+data:
+  input_dataset: data/textvqa_small
+  output_json: outputs/predictions.json
