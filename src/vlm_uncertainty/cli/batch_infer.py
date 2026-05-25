@@ -33,7 +33,7 @@ def _pick(cli_value: Any, config: dict[str, Any], key: str, default: Any = None)
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run Qwen2.5-VL inference over a prepared dataset.")
-    parser.add_argument("--config", default=None, help="Experiment YAML config path.")
+    parser.add_argument("--config", default="configs/experiment/qwen25_vl_3b_instruct.yaml", help="Experiment YAML config path.")
     parser.add_argument("--input", default=None, help="Input Arrow dataset directory.")
     parser.add_argument("--output", default=None, help="Output JSON file path.")
     parser.add_argument("--system-prompt", default=None)

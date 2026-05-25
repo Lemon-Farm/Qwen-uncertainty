@@ -15,5 +15,5 @@ generation:
   top_p: null
 
 data:
-  input_dataset: data/textvqa_small
+  input_dataset: data/docvqa_small_gaussian_blur_r5
   output_json: outputs/predictions.json
