@@ -1,28 +1,30 @@
-# VLM Uncertainty
+# VLM Semantic Uncertainty
 
-Qwen2.5-VL 기반 VQA/Document VQA 응답의 uncertainty를 측정하기 위한 실험 레포.
-현재 목표는 이미지 perturbation 전후의 VLM 답변 변화를 보고, Semantic Uncertainty 방식으로 의미 단위 불확실성을 계산하는 것이다.
+Qwen2.5-VL 기반 VQA/Document VQA 응답의 Semantic Uncertainty 실험 레포.
+이미지 perturbation 전후로 VLM의 답변 분포가 얼마나 의미적으로 흔들리는지 측정하고, clean/perturbed 구분 성능을 ROC-AUC와 F1-score로 평가한다.
 
-## Experiment
+## Experiment Summary
 
-기본 흐름:
+실험 흐름은 다음과 같다.
 
-1. Hugging Face VQA dataset을 Arrow dataset으로 준비한다.
-2. Qwen2.5-VL-3B-Instruct로 한 질문당 여러 답변을 sampling한다.
+1. VQA dataset을 Hugging Face Arrow dataset으로 준비한다.
+2. 같은 질문에 대해 VLM 답변을 여러 번 sampling한다.
 3. 각 답변의 token log probability를 저장한다.
 4. NLI 모델로 답변들을 semantic cluster로 묶는다.
-5. clean dataset과 perturbed dataset의 uncertainty를 비교한다.
+5. cluster 단위 확률로 Semantic Entropy를 계산한다.
+6. clean dataset과 perturbed dataset의 Semantic Entropy를 비교한다.
+7. ROC curve, AUC, best F1-score를 report로 저장한다.
 
-## Current Setup
+## Setup
 
 - VLM: `Qwen/Qwen2.5-VL-3B-Instruct`
-- Inference backend: `transformers`, `qwen-vl-utils`, `torch`
-- Dataset format: Hugging Face Arrow dataset
-- Output format: JSON
 - NLI model: `cross-encoder/nli-deberta-v3-large`
-- Implemented perturbation: Gaussian blur, radius `5`
+- Dataset format: Hugging Face Arrow dataset
+- Inference output: JSON
+- Perturbation: Gaussian blur, radius `5`
+- Package runner: `uv`
 
-## Implemented
+## Commands
 
 Dataset prepare:
 
@@ -32,7 +34,7 @@ uv run prepare-docvqa
 uv run prepare-textvqa
 ```
 
-Batch VLM inference:
+VLM inference:
 
 ```bash
 uv run vlm-batch-infer --config configs/experiment/qwen25_vl_3b_instruct.yaml
@@ -50,25 +52,78 @@ NLI semantic clustering:
 uv run vlm-semantic-cluster --config configs/uncertainty/semantic_clustering.yaml
 ```
 
-Current inference output includes:
+Semantic Entropy calculation:
 
-- generated answers
-- per-answer log probability
-- normalized log probability
-- semantic clusters
+```bash
+uv run calculate-SE \
+  --predictions outputs/predictions.json \
+  --clusters outputs/predictions_semantic_clusters.json \
+  --output outputs/predictions_semantic_entropy.json
+```
+
+Clean vs perturbed evaluation:
+
+```bash
+uv run evaluate-roc-f1 \
+  --clean outputs/clean/predictions_semantic_entropy.json \
+  --perturbed outputs/perturbed/predictions_semantic_entropy.json \
+  --report-dir reports/docvqa
+```
 
 ## Configs
 
-- `configs/experiment/qwen25_vl_3b_instruct.yaml`: model, generation, input/output paths
-- `configs/perturbation/gaussian_blur.yaml`: perturbation target dataset and blur setting
-- `configs/uncertainty/semantic_clustering.yaml`: NLI model and clustering settings
+- `configs/experiment/qwen25_vl_3b_instruct.yaml`: model, generation, input/output path settings
+- `configs/perturbation/gaussian_blur.yaml`: perturbation dataset path and blur radius
+- `configs/uncertainty/semantic_clustering.yaml`: NLI model, NLI batch size, entailment clustering settings
 
-## Todo
+## Outputs
 
-- Implement semantic entropy calculation from semantic clusters and answer logprobs.
-- Add clean vs perturbed uncertainty comparison script.
-- Add aggregation metrics across datasets.
-- Add reproducible seed handling for generation.
-- Add evaluation helpers for datasets with ground-truth answers.
-- Add more perturbations beyond Gaussian blur.
-- Add lightweight tests for CLI configs and output schemas.
+Inference JSON contains:
+
+- `predictions`: sampled answer strings
+- `prediction_details`: answer text, log probability, token length, normalized log probability
+
+Semantic clustering JSON adds:
+
+- `semantic_clusters`
+- `cluster_texts`
+- `num_semantic_clusters`
+
+Semantic Entropy JSON contains:
+
+- `id`
+- `prompt`
+- `images`
+- `predictions`
+- `sementic_entropy`
+
+Reports contain:
+
+- `roc_f1_summary.json`
+- `roc_curve.csv`
+- `roc_curve.png`
+
+Current report directories:
+
+- `reports/docvqa`
+- `reports/docvqa_small`
+- `reports/docvqa_high_temp`
+
+## Implemented
+
+- Qwen2.5-VL single and batch inference
+- Multi-sample generation with `n_generation`
+- Per-answer generation log probability extraction
+- VizWiz, DocVQA, TextVQA dataset preparation
+- Arrow dataset loading and saving
+- Gaussian blur perturbation dataset generation
+- NLI-based semantic equivalence clustering
+- Semantic Entropy calculation from cluster probabilities
+- Clean vs perturbed ROC-AUC and best F1 evaluation
+- Matplotlib ROC curve generation with AUC annotation
+
+## Notes
+
+- `reports/` is intentionally tracked and should be committed with experiment results.
+- `data/`, `outputs/`, and checkpoints remain ignored because they can be large or easily regenerated.
+- The output key is currently spelled `sementic_entropy` for compatibility with existing generated files.

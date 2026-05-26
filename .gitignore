@@ -28,6 +28,7 @@ lightning_logs/
 runs/
 
 # Local data and generated artifacts
+# Reports are intentionally tracked.
 data/*
 !data/.gitkeep
 outputs/*
