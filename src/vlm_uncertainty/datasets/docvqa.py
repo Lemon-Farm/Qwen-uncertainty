@@ -5,6 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from tqdm import tqdm
+
 from vlm_uncertainty.datasets.arrow import save_vl_arrow
 
 
@@ -59,6 +61,7 @@ def prepare_docvqa(
         raise RuntimeError("Preparing DocVQA requires `datasets`. Run `uv sync` first.") from exc
 
     dataset_split = f"{split}[:{limit}]" if limit is not None else split
+    print(f"Loading {dataset_id}/{dataset_name or ''} split={dataset_split}...")
     dataset = load_dataset(
         dataset_id,
         dataset_name,
@@ -66,12 +69,13 @@ def prepare_docvqa(
         trust_remote_code=trust_remote_code,
     )
     dataset = dataset.select_columns(["questionId", "question", "image"])
+    print(f"Loaded {len(dataset)} examples. Saving images to {image_dir}...")
 
     image_root = Path(image_dir)
     output_parent = Path(output_path).parent
     records: list[dict[str, str]] = []
 
-    for index, example in enumerate(dataset):
+    for index, example in enumerate(tqdm(dataset, desc="prepare docvqa")):
         if limit is not None and index >= limit:
             break
 

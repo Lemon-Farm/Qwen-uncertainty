@@ -15,8 +15,8 @@ from vlm_uncertainty.datasets.docvqa import (
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Prepare lmms-lab/DocVQA into the local Arrow dataset format.")
     parser.add_argument("--split", default="validation", help="Hugging Face split to prepare, e.g. validation or test.")
-    parser.add_argument("--output", default="data/docvqa_validation", help="Output Arrow dataset directory.")
-    parser.add_argument("--image-dir", default="data/docvqa_images", help="Directory where images will be saved.")
+    parser.add_argument("--output", default="data/docvqa_500", help="Output Arrow dataset directory.")
+    parser.add_argument("--image-dir", default="data/docvqa_500_images", help="Directory where images will be saved.")
     parser.add_argument("--dataset-id", default=DEFAULT_DATASET_ID, help="Hugging Face dataset id.")
     parser.add_argument("--dataset-name", default=DEFAULT_DATASET_NAME, help="Hugging Face dataset config name.")
     parser.add_argument(
@@ -24,7 +24,7 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_PROMPT_TEMPLATE,
         help="Prompt template. Use {question} where the DocVQA question should appear.",
     )
-    parser.add_argument("--limit", type=int, default=None, help="Optional max number of examples for smoke tests.")
+    parser.add_argument("--limit", type=int, default=500, help="Optional max number of examples for smoke tests.")
     parser.add_argument("--trust-remote-code", action="store_true")
     return parser.parse_args()
 

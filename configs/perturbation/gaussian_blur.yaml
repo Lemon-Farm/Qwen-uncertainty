@@ -1,8 +1,8 @@
 data:
-  input_dataset: data/docvqa_small
-  output_dataset: data/docvqa_small_gaussian_blur_r5
-  output_image_dir: data/perturbed_images
+  input_dataset: data/docvqa_500
+  output_dataset: data/docvqa_perturbed_strong
+  output_image_dir: data/docvqa_perturbed_images_strong
 
 perturbation:
   name: gaussian_blur
-  radius: 5
+  radius: 10

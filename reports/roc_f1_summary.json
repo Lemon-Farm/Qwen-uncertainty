@@ -1,0 +1,21 @@
+{
+  "clean_json": "outputs/clean/predictions_semantic_entropy.json",
+  "perturbed_json": "outputs/perturbed/predictions_semantic_entropy.json",
+  "n_clean": 500,
+  "n_perturbed": 500,
+  "score_key": "sementic_entropy",
+  "positive_label": "perturbed",
+  "auc": 0.9218239999999999,
+  "best_f1": {
+    "threshold": 2.0166364960654487e-06,
+    "f1": 0.8533333333333334,
+    "precision": 0.768,
+    "recall": 0.96,
+    "tp": 480,
+    "fp": 145,
+    "tn": 355,
+    "fn": 20
+  },
+  "roc_curve_png": "reports/roc_curve.png",
+  "roc_curve_csv": "reports/roc_curve.csv"
+}

@@ -7,9 +7,11 @@ requires-python = ">=3.12"
 dependencies = [
     "accelerate>=0.34.0",
     "datasets>=2.20.0",
+    "matplotlib>=3.8.0",
     "pillow>=10.0.0",
     "pyyaml>=6.0.0",
     "qwen-vl-utils>=0.0.8",
+    "scikit-learn>=1.4.0",
     "torch>=2.4.0",
     "torchvision>=0.19.0",
     "tqdm>=4.66.0",
@@ -24,6 +26,8 @@ prepare-docvqa = "vlm_uncertainty.cli.prepare_docvqa:main"
 prepare-textvqa = "vlm_uncertainty.cli.prepare_textvqa:main"
 perturb-dataset = "vlm_uncertainty.cli.perturb_dataset:main"
 vlm-semantic-cluster = "vlm_uncertainty.cli.semantic_cluster:main"
+calculate-SE = "vlm_uncertainty.cli.calculate_SE:main"
+evaluate-roc-f1 = "vlm_uncertainty.cli.evaluate_roc_f1:main"
 
 [build-system]
 requires = ["hatchling"]

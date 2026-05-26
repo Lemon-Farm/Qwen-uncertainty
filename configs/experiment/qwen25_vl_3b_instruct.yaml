@@ -8,12 +8,12 @@ model:
 
 generation:
   max_new_tokens: 50
-  batch_size: 8
-  n_generation: 3
+  batch_size: 16
+  n_generation: 10
   do_sample: true
-  temperature: 1.0
+  temperature: 0.7
   top_p: null
 
 data:
-  input_dataset: data/docvqa_small_gaussian_blur_r5
+  input_dataset: data/docvqa_500
   output_json: outputs/predictions.json
